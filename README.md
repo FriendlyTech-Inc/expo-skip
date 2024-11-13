@@ -1,50 +1,95 @@
-# Welcome to your Expo app 👋
+# Expo Skip
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+学習進捗管理アプリケーション
 
-## Get started
+## 概要
 
-1. Install dependencies
+映像授業とAttack5の2つの学習コンテンツを提供し、学習進捗を視覚的に管理できるモバイルアプリケーションです。
 
-   ```bash
-   npm install
-   ```
+## 機能
 
-2. Start the app
+- 学習進捗の視覚化
+- 映像授業とAttack5へのアクセス
+- 前回の続きからの学習再開
+- リアルタイムの進捗トラッキング
 
-   ```bash
-    npx expo start
-   ```
+## 技術スタック
 
-In the output, you'll find options to open the app in a
+- React Native (Expo)
+- TypeScript
+- Expo Router
+- React Native Paper
+- React Native SVG
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 必要要件
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Node.js (v16以上)
+- Expo CLI
+- iOS開発: Xcode
+- Android開発: Android Studio
 
-## Get a fresh project
-
-When you're ready, run:
+## インストール
 
 ```bash
-npm run reset-project
+# リポジトリのクローン
+git clone https://github.com/YourUsername/expo-skip.git
+
+# プロジェクトディレクトリへ移動
+cd expo-skip
+
+# 依存関係のインストール
+npm install
+
+# 開発サーバーの起動
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 開発環境のセットアップ
 
-## Learn more
+### iOS
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npx expo run:ios
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Android
 
-## Join the community
+```bash
+npx expo run:android
+```
 
-Join our community of developers creating universal apps.
+## テスト用アカウント
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- ID: expo-skip
+- Password: Pass
+
+## プロジェクト構造
+
+```
+expo-skip/
+├── app/                    # アプリケーションのメインコード
+├── components/            # 再利用可能なコンポーネント
+├── constants/            # 定数定義
+├── hooks/               # カスタムフック
+└── assets/             # 画像等のアセット
+```
+
+## スクリーンショット
+
+[スクリーンショットを追加予定]
+
+## 貢献
+
+プルリクエストは歓迎します。大きな変更を加える場合は、まずissueを作成して変更内容を議論してください。
+
+## ライセンス
+
+[ライセンスを追加]
+
+## 作者
+
+[作者情報を追加]
+
+## 謝辞
+
+[必要に応じて追加]

@@ -1,26 +1,32 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+// constants/Colors.ts
+export default {
+  primary: '#E75480',
+  secondary: '#4A90E2',
+  background: '#f5f5f5',
+  card: '#ffffff',
+  text: '#333333',
+  subText: '#666666',
+  border: '#e1e1e1',
+  error: '#ff3b30',
+  success: '#34c759',
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+  progressChart: {
+    video: '#4A90E2',
+    quiz: '#E75480',
+  },
 
-export const Colors = {
   light: {
-    text: '#11181C',
+    text: '#000',
     background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    tint: '#E75480',
+    tabIconDefault: '#ccc',
+    tabIconSelected: '#E75480',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: '#fff',
+    background: '#000',
+    tint: '#E75480',
+    tabIconDefault: '#ccc',
+    tabIconSelected: '#E75480',
   },
 };
