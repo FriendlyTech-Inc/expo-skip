@@ -1,8 +1,8 @@
 // app/(study)/video/[courseId].tsx
-import { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import CourseHeader from '@/components/study/shared/CourseHeader';
 import ProgressBar from '@/components/study/shared/ProgressBar';
@@ -30,6 +30,11 @@ export default function VideoCourseDetail() {
         ? prev.filter((id) => id !== chapterId)
         : [...prev, chapterId]
     );
+  };
+
+  // レッスンタップ時の処理を追加
+  const handleLessonPress = (lessonId: string) => {
+    router.push(`/video/player/${lessonId}`);
   };
 
   return (
@@ -68,10 +73,7 @@ export default function VideoCourseDetail() {
                   <TouchableOpacity
                     key={lesson.id}
                     style={styles.lessonItem}
-                    onPress={() => {
-                      // TODO: レッスン再生画面への遷移
-                      console.log('Navigate to lesson:', lesson.id);
-                    }}
+                    onPress={() => handleLessonPress(lesson.id)}
                     activeOpacity={0.7}
                   >
                     <View style={styles.lessonInfo}>
