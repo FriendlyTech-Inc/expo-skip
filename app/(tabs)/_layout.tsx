@@ -14,6 +14,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useState, useRef, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -39,6 +40,17 @@ export default function TabLayout() {
         setModalVisible(false);
       }
     });
+  };
+
+  // 学習コンテンツへの遷移
+  const navigateToContent = (type: 'video' | 'attack') => {
+    handleCloseModal();
+    // ビデオコースまたはAttack5コースへ遷移
+    if (type === 'video') {
+      router.push('/(study)/video/');
+    } else {
+      router.push('/(study)/attack/');
+    }
   };
 
   useEffect(() => {
@@ -226,6 +238,7 @@ export default function TabLayout() {
               justifyContent: 'center',
               minHeight: 56,
             }}
+            onPress={() => navigateToContent('video')}
             activeOpacity={0.7}>
             <MaterialCommunityIcons name="play-circle" size={24} color="#fff" style={{ marginRight: 12 }} />
             <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>映像学習</Text>
@@ -241,81 +254,10 @@ export default function TabLayout() {
               justifyContent: 'center',
               minHeight: 56,
             }}
+            onPress={() => navigateToContent('attack')}
             activeOpacity={0.7}>
             <MaterialCommunityIcons name="lightning-bolt" size={24} color="#fff" style={{ marginRight: 12 }} />
             <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>Attack5</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* 前回の続きセクション */}
-        <View style={{
-          backgroundColor: '#fff',
-          borderRadius: 16,
-          padding: 20,
-          ...Platform.select({
-            ios: {
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.15,
-              shadowRadius: 12,
-            },
-            android: {
-              elevation: 8,
-            },
-          }),
-        }}>
-          <Text style={{
-            fontSize: 15,
-            fontWeight: '600',
-            color: '#666',
-            marginBottom: 16,
-          }}>
-            前回の続きから学習する
-          </Text>
-
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#fff',
-              borderRadius: 12,
-              padding: 16,
-              marginBottom: 12,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderWidth: 1.5,
-              borderColor: Colors.progressChart.video,
-              minHeight: 56,
-            }}
-            activeOpacity={0.7}>
-            <MaterialCommunityIcons 
-              name="play-circle" 
-              size={24} 
-              color={Colors.progressChart.video} 
-              style={{ marginRight: 12 }} 
-            />
-            <Text style={{ color: Colors.progressChart.video, fontSize: 16, fontWeight: '600' }}>映像学習</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              backgroundColor: '#fff',
-              borderRadius: 12,
-              padding: 16,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderWidth: 1.5,
-              borderColor: Colors.primary,
-              minHeight: 56,
-            }}
-            activeOpacity={0.7}>
-            <MaterialCommunityIcons 
-              name="lightning-bolt" 
-              size={24} 
-              color={Colors.primary} 
-              style={{ marginRight: 12 }} 
-            />
-            <Text style={{ color: Colors.primary, fontSize: 16, fontWeight: '600' }}>Attack5</Text>
           </TouchableOpacity>
         </View>
       </Animated.View>
