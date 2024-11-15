@@ -2,11 +2,13 @@
 import { StyleSheet, View, Animated, Keyboard, Platform } from 'react-native';
 import { Button, Text, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, Redirect } from 'expo-router';
 import { useState, useEffect, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { TextInput } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const AUTH_KEY = 'isAuthenticated';
 const __DEV__ = process.env.NODE_ENV === 'development';
 
 export default function LoginScreen() {
@@ -20,8 +22,13 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
+    // 認証状態をチェック
+    checkAuthStatus();
+
+    // アニメーション開始
     const keyboardWillShow = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
     const keyboardWillHide = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
@@ -60,57 +67,64 @@ export default function LoginScreen() {
     };
   }, []);
 
-  const handleLogin = async () => {
-    Keyboard.dismiss();
-    
-    if (!studentId || !password) {
-      setError('学生番号とパスワードを入力してください 🙇‍♂️');
-      return;
+  // 認証状態のチェック
+  const checkAuthStatus = async () => {
+    try {
+      const auth = await AsyncStorage.getItem(AUTH_KEY);
+      setIsAuthenticated(auth === 'true');
+    } catch (e) {
+      setIsAuthenticated(false);
     }
-
-    setIsLoading(true);
-    setError('');
-
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    if (studentId === '1234' && password === 'Pass') {
-      Animated.sequence([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 400,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: -30,
-          duration: 400,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        router.replace('/(tabs)');
-      });
-    } else {
-      setError('学生番号またはパスワードが間違っています 🔍');
-      Animated.sequence([
-        Animated.timing(slideAnim, {
-          toValue: -10,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 10,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }
-
-    setIsLoading(false);
   };
+
+  // 認証成功時の処理を修正
+const handleLogin = async () => {
+  Keyboard.dismiss();
+  
+  if (!studentId || !password) {
+    setError('学生番号とパスワードを入力してください 🙇‍♂️');
+    return;
+  }
+
+  setIsLoading(true);
+  setError('');
+
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  if (studentId === '1234' && password === 'Pass') {
+    router.replace('/(tabs)');
+  } else {
+    setError('学生番号またはパスワードが間違っています 🔍');
+    Animated.sequence([
+      Animated.timing(slideAnim, {
+        toValue: -10,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 10,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }
+
+  setIsLoading(false);
+};
+  // 認証状態のチェックが完了していない場合
+  if (isAuthenticated === null) {
+    return null;
+  }
+
+  // すでに認証済みの場合
+  if (isAuthenticated) {
+    return <Redirect href="/(tabs)" />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -127,12 +141,13 @@ export default function LoginScreen() {
           }
         ]}
       >
+        {/* 既存のログインUI */}
         <View style={styles.logoContainer}>
           <Text style={styles.logoText}>
             skip
           </Text>
           <Text style={styles.subText}>
-            skipで実りある学びを（サブテキスト）
+            skipで実りある学びを
           </Text>
         </View>
 
@@ -290,7 +305,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   buttonContent: {
-    paddingVertical: 12,  // 8から12に増やして十分な高さを確保
+    paddingVertical: 12,
   },
   helpText: {
     textAlign: 'center',
