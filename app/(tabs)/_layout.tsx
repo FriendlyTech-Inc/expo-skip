@@ -166,12 +166,14 @@ export default function TabLayout() {
             ),
           }}
         />
+        
         <Tabs.Screen
-          name="explore"
+          name="lms"
           options={{
-            title: 'Explore',
+            title: 'LMS',
+            headerShown: false,
             tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name="compass" size={24} color={color} />
+              <MaterialCommunityIcons name="school" size={24} color={color} />
             ),
           }}
         />

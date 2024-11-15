@@ -1,5 +1,5 @@
 // app/(auth)/login.tsx
-import { StyleSheet, View, Animated, Keyboard, Platform } from 'react-native';
+import { StyleSheet, View, Animated, Keyboard, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import { Button, Text, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Redirect } from 'expo-router';
@@ -23,15 +23,11 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
-    // 認証状態をチェック
     checkAuthStatus();
-
-    // アニメーション開始
-    const keyboardWillShow = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const keyboardWillHide = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-
+    
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -45,7 +41,11 @@ export default function LoginScreen() {
       }),
     ]).start();
 
-    const keyboardShowListener = Keyboard.addListener(keyboardWillShow, () => {
+    const keyboardWillShow = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const keyboardWillHide = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSubscription = Keyboard.addListener(keyboardWillShow, () => {
+      setKeyboardVisible(true);
       Animated.timing(logoScaleAnim, {
         toValue: 0.8,
         duration: 300,
@@ -53,7 +53,8 @@ export default function LoginScreen() {
       }).start();
     });
 
-    const keyboardHideListener = Keyboard.addListener(keyboardWillHide, () => {
+    const hideSubscription = Keyboard.addListener(keyboardWillHide, () => {
+      setKeyboardVisible(false);
       Animated.timing(logoScaleAnim, {
         toValue: 1,
         duration: 300,
@@ -62,12 +63,11 @@ export default function LoginScreen() {
     });
 
     return () => {
-      keyboardShowListener.remove();
-      keyboardHideListener.remove();
+      showSubscription.remove();
+      hideSubscription.remove();
     };
   }, []);
 
-  // 認証状態のチェック
   const checkAuthStatus = async () => {
     try {
       const auth = await AsyncStorage.getItem(AUTH_KEY);
@@ -77,51 +77,49 @@ export default function LoginScreen() {
     }
   };
 
-  // 認証成功時の処理を修正
-const handleLogin = async () => {
-  Keyboard.dismiss();
-  
-  if (!studentId || !password) {
-    setError('学生番号とパスワードを入力してください 🙇‍♂️');
-    return;
-  }
+  const handleLogin = async () => {
+    Keyboard.dismiss();
+    
+    if (!studentId || !password) {
+      setError('学生番号とパスワードを入力してください 🙇‍♂️');
+      return;
+    }
 
-  setIsLoading(true);
-  setError('');
+    setIsLoading(true);
+    setError('');
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-  if (studentId === '1234' && password === 'Pass') {
-    router.replace('/(tabs)');
-  } else {
-    setError('学生番号またはパスワードが間違っています 🔍');
-    Animated.sequence([
-      Animated.timing(slideAnim, {
-        toValue: -10,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 10,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }
+    if (studentId === '1234' && password === 'Pass') {
+      router.replace('/(tabs)');
+    } else {
+      setError('学生番号またはパスワードが間違っています 🔍');
+      Animated.sequence([
+        Animated.timing(slideAnim, {
+          toValue: -10,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 10,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
 
-  setIsLoading(false);
-};
-  // 認証状態のチェックが完了していない場合
+    setIsLoading(false);
+  };
+
   if (isAuthenticated === null) {
     return null;
   }
 
-  // すでに認証済みの場合
   if (isAuthenticated) {
     return <Redirect href="/(tabs)" />;
   }
@@ -129,100 +127,110 @@ const handleLogin = async () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-      <Animated.View 
-        style={[
-          styles.content,
-          {
-            opacity: fadeAnim,
-            transform: [
-              { translateY: slideAnim },
-              { scale: logoScaleAnim }
-            ],
-          }
-        ]}
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
       >
-        {/* 既存のログインUI */}
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>
-            skip
-          </Text>
-          <Text style={styles.subText}>
-            skipで実りある学びを
-          </Text>
-        </View>
-
-        <View style={styles.formContainer}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>学生番号</Text>
-            <TextInput
-              value={studentId}
-              onChangeText={(text) => {
-                setStudentId(text);
-                setError('');
-              }}
-              style={[
-                styles.input,
-                error && !studentId && styles.inputError
-              ]}
-              keyboardType="numeric"
-              placeholderTextColor="rgba(255, 255, 255, 0.5)"
-              editable={!isLoading}
-              maxLength={8}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>パスワード</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  setError('');
-                }}
-                secureTextEntry={!showPassword}
-                style={[
-                  styles.input,
-                  styles.passwordInput,
-                  error && !password && styles.inputError
-                ]}
-                placeholderTextColor="rgba(255, 255, 255, 0.5)"
-                editable={!isLoading}
-              />
-              <IconButton
-                icon={showPassword ? 'eye-off' : 'eye'}
-                iconColor="#ffffff"
-                size={24}
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.eyeIcon}
-              />
-            </View>
-          </View>
-
-          {error ? (
-            <Animated.Text style={styles.errorText}>{error}</Animated.Text>
-          ) : null}
-
-          <Button
-            mode="contained"
-            onPress={handleLogin}
-            style={styles.button}
-            loading={isLoading}
-            disabled={isLoading}
-            contentStyle={styles.buttonContent}
-            buttonColor="#ffffff"
-            textColor="#E75480"
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer}
+            bounces={false}
+            keyboardShouldPersistTaps="handled"
           >
-            {isLoading ? 'ログイン中...' : 'LOGIN'}
-          </Button>
+            <Animated.View 
+              style={[
+                styles.content,
+                {
+                  opacity: fadeAnim,
+                  transform: [
+                    { translateY: slideAnim },
+                    { scale: logoScaleAnim }
+                  ],
+                }
+              ]}
+            >
+              <View style={[styles.logoContainer, keyboardVisible && styles.logoContainerSmall]}>
+                <Text style={styles.logoText}>
+                  skip
+                </Text>
+                <Text style={styles.subText}>
+                  skipで実りある学びを
+                </Text>
+              </View>
 
-          {__DEV__ && (
-            <Text style={styles.helpText}>
-              開発用: 1234 / Pass
-            </Text>
-          )}
-        </View>
-      </Animated.View>
+              <View style={styles.formContainer}>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>学生番号</Text>
+                  <TextInput
+                    value={studentId}
+                    onChangeText={(text) => {
+                      setStudentId(text);
+                      setError('');
+                    }}
+                    style={[
+                      styles.input,
+                      error && !studentId && styles.inputError
+                    ]}
+                    keyboardType="numeric"
+                    maxLength={8}
+                    editable={!isLoading}
+                  />
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>パスワード</Text>
+                  <View style={styles.passwordContainer}>
+                    <TextInput
+                      value={password}
+                      onChangeText={(text) => {
+                        setPassword(text);
+                        setError('');
+                      }}
+                      secureTextEntry={!showPassword}
+                      style={[
+                        styles.input,
+                        styles.passwordInput,
+                        error && !password && styles.inputError
+                      ]}
+                      editable={!isLoading}
+                    />
+                    <IconButton
+                      icon={showPassword ? 'eye-off' : 'eye'}
+                      iconColor="#ffffff"
+                      size={24}
+                      onPress={() => setShowPassword(!showPassword)}
+                      style={styles.eyeIcon}
+                    />
+                  </View>
+                </View>
+
+                {error ? (
+                  <Animated.Text style={styles.errorText}>{error}</Animated.Text>
+                ) : null}
+
+                <Button
+                  mode="contained"
+                  onPress={handleLogin}
+                  style={styles.button}
+                  loading={isLoading}
+                  disabled={isLoading}
+                  contentStyle={styles.buttonContent}
+                  buttonColor="#ffffff"
+                  textColor="#E75480"
+                >
+                  {isLoading ? 'ログイン中...' : 'LOGIN'}
+                </Button>
+
+                {__DEV__ && (
+                  <Text style={styles.helpText}>
+                    開発用: 1234 / Pass
+                  </Text>
+                )}
+              </View>
+            </Animated.View>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -232,6 +240,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#E75480',
   },
+  scrollContainer: {
+    flexGrow: 1,
+  },
   content: {
     flex: 1,
     padding: 24,
@@ -240,6 +251,11 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: 'center',
     marginBottom: 60,
+    marginTop: 40,
+  },
+  logoContainerSmall: {
+    marginBottom: 30,
+    marginTop: 20,
   },
   logoText: {
     fontSize: 48,
