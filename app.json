@@ -29,6 +29,15 @@
     "plugins": [
       "expo-router"
     ],
-    "newArchEnabled": true
+    "newArchEnabled": true,
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ee4c2f64-fef9-4c8a-bad4-a38e792340bc"
+      }
+    },
+    "owner": "tsunoda_s"
   }
 }
