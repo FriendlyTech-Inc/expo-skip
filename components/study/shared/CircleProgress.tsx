@@ -1,6 +1,6 @@
 // components/study/shared/CircleProgress.tsx
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { Text } from 'react-native-paper';
 import Svg, { Circle, G } from 'react-native-svg';
 import Colors from '@/constants/Colors';
@@ -18,10 +18,10 @@ interface CircleProgressProps {
 
 export default function CircleProgress({
   progress,
-  size = 120,
+  size = 140,
   strokeWidth = 12,
   progressColor = Colors.primary,
-  backgroundColor = '#E0E0E0',
+  backgroundColor = '#F5F5F5',
   title,
   total,
   remaining,
@@ -36,9 +36,8 @@ export default function CircleProgress({
       {title && <Text style={styles.title}>{title}</Text>}
       
       <View style={styles.progressContainer}>
-        <Svg width={size} height={size}>
-          <G rotation="-90" origin={`${size / 2}, ${size / 2}`}>
-            {/* Background Circle */}
+        <Svg width={size} height={size} style={styles.svg}>
+          <G rotation="-135" origin={`${size / 2}, ${size / 2}`}>
             <Circle
               cx={size / 2}
               cy={size / 2}
@@ -47,7 +46,6 @@ export default function CircleProgress({
               strokeWidth={strokeWidth}
               fill="none"
             />
-            {/* Progress Circle */}
             <Circle
               cx={size / 2}
               cy={size / 2}
@@ -61,34 +59,35 @@ export default function CircleProgress({
             />
           </G>
         </Svg>
-        <View style={[styles.valueContainer, { width: size, height: size }]}>
-          <Text style={styles.progressValue}>{progressValue.toFixed(1)}</Text>
+        <View style={styles.valueContainer}>
+          <Text style={styles.progressValue}>
+            {progressValue.toFixed(1)}
+          </Text>
           <Text style={styles.progressUnit}>%</Text>
         </View>
       </View>
-
-      {(total !== undefined && remaining !== undefined) && (
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{total}</Text>
-            <Text style={styles.statLabel}>総項目数</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{remaining}</Text>
-            <Text style={styles.statLabel}>残り項目</Text>
-          </View>
-        </View>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
     backgroundColor: '#fff',
+    borderRadius: 16,
     padding: 20,
+    alignItems: 'center',
+    margin: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   title: {
     fontSize: 16,
@@ -98,47 +97,27 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     position: 'relative',
+    width: 140,
+    height: 140,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  valueContainer: {
+  svg: {
     position: 'absolute',
+  },
+  valueContainer: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   progressValue: {
-    fontSize: 28,
-    fontWeight: '600',
+    fontSize: 32,
+    fontWeight: '700',
     color: Colors.text,
+    lineHeight: 38,
   },
   progressUnit: {
     fontSize: 14,
     color: Colors.subText,
     marginTop: 2,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    marginTop: 20,
-    paddingHorizontal: 20,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: Colors.subText,
-    marginTop: 4,
-  },
-  statDivider: {
-    width: 1,
-    height: '100%',
-    backgroundColor: '#E0E0E0',
-    marginHorizontal: 20,
   },
 });

@@ -1,48 +1,40 @@
 import React from 'react';
-import { StyleSheet, View, Animated } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from 'react-native-paper';
 import Svg, { Circle } from 'react-native-svg';
 import Colors from '@/constants/Colors';
-import Typography from '@/components/common/Typography';
-import { spacing } from '@/styles/spacing';
 
 interface CircleProgressProps {
   progress: number;
   title: string;
   color: string;
   size?: number;
-  strokeWidth?: number;
 }
 
 export default function CircleProgress({
   progress,
   title,
   color,
-  size = 80,
-  strokeWidth = 8,
+  size = 120,
 }: CircleProgressProps) {
+  const strokeWidth = 8;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
-  const progressValue = Math.min(100, Math.max(0, progress));
-  const strokeDashoffset = circumference - (progressValue / 100) * circumference;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   return (
     <View style={styles.container}>
-      <Typography variant="caption" style={styles.title}>
-        {title}
-      </Typography>
+      <Text style={styles.title}>{title}</Text>
       <View style={styles.progressContainer}>
-        <Svg width={size} height={size} style={styles.svg}>
-          {/* Background circle */}
+        <Svg width={size} height={size}>
           <Circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke={color}
+            stroke="#F5F5F5"
             strokeWidth={strokeWidth}
-            opacity={0.2}
             fill="none"
           />
-          {/* Progress circle */}
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -50,19 +42,17 @@ export default function CircleProgress({
             stroke={color}
             strokeWidth={strokeWidth}
             strokeDasharray={circumference}
-            strokeDashoffset={String(strokeDashoffset)}
+            strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
             fill="none"
             transform={`rotate(-90 ${size / 2} ${size / 2})`}
           />
         </Svg>
         <View style={styles.valueContainer}>
-          <Typography variant="body1" style={styles.value}>
-            {progressValue.toFixed(1)}
-          </Typography>
-          <Typography variant="caption" style={styles.unit}>
-            %
-          </Typography>
+          <Text style={[styles.value, { color }]}>
+            {progress.toFixed(1)}
+          </Text>
+          <Text style={styles.unit}>%</Text>
         </View>
       </View>
     </View>
@@ -72,32 +62,31 @@ export default function CircleProgress({
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    padding: 12,
   },
   title: {
-    fontSize: 12,
+    fontSize: 14,
     color: Colors.subText,
-    marginBottom: spacing.xs,
+    marginBottom: 12,
   },
   progressContainer: {
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  svg: {
-    transform: [{ rotate: '-90deg' }],
-  },
   valueContainer: {
     position: 'absolute',
     alignItems: 'center',
-    justifyContent: 'center',
   },
   value: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
+    fontSize: 24,
+    fontWeight: '700',
   },
   unit: {
-    fontSize: 10,
+    fontSize: 12,
     color: Colors.subText,
+    marginTop: 2,
   },
 });

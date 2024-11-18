@@ -16,6 +16,7 @@ export default {
   // システムカラー - よりビビッドな色に
   error: '#EF4444',
   success: '#10B981',
+  white: '#FFFFFF',
 
   // プログレスチャートの色 - より鮮やかに
   progressChart: {

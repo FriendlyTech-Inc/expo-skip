@@ -6,6 +6,7 @@ type TypographyVariant =
   | 'h1' 
   | 'h2' 
   | 'h3'
+  | 'subtitle1'
   | 'body1'
   | 'body2'
   | 'caption'
@@ -82,6 +83,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.25,
     lineHeight: 26,
+  },
+  subtitle1: {
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 24,
   },
   body1: {
     fontSize: 16,

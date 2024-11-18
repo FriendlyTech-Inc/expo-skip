@@ -1,10 +1,11 @@
-// components/home/LearningGraphs/index.tsx
+// /components/home/LearningGraphs/index.tsx を更新
 import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Platform, UIManager } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 import Colors from '@/constants/Colors';
 import VideoProgress from './VideoProgress';
 import AttackProgress from './AttackProgress';
+import * as Haptics from 'expo-haptics';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -14,12 +15,12 @@ export default function LearningGraphs() {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const toggleExpand = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setIsExpanded(!isExpanded);
   };
 
   return (
     <View style={styles.container}>
-      {/* ヘッダー部分 */}
       <TouchableOpacity 
         style={styles.header} 
         onPress={toggleExpand}
@@ -34,16 +35,12 @@ export default function LearningGraphs() {
         />
       </TouchableOpacity>
 
-      {/* グラフ部分 */}
       {isExpanded && (
         <View style={styles.content}>
           <View style={styles.graphContainer}>
-            <Text style={styles.graphTitle}>映像進捗推移</Text>
             <VideoProgress />
           </View>
-
-          <View style={[styles.graphContainer, styles.secondGraph]}>
-            <Text style={styles.graphTitle}>Attack5推移</Text>
+          <View style={styles.graphContainer}>
             <AttackProgress />
           </View>
         </View>
@@ -54,16 +51,15 @@ export default function LearningGraphs() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.card,
     borderRadius: 12,
-    overflow: 'hidden',
+    marginBottom: 16,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    padding: 16,
   },
   title: {
     fontSize: 16,
@@ -71,19 +67,12 @@ const styles = StyleSheet.create({
     color: Colors.text,
   },
   content: {
-    overflow: 'hidden',
+    padding: 16,
   },
   graphContainer: {
-    padding: 16,
-    paddingBottom: 24,
-  },
-  graphTitle: {
-    fontSize: 14,
-    color: Colors.subText,
-    marginBottom: 12,
-  },
-  secondGraph: {
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    backgroundColor: Colors.background,
+    borderRadius: 8,
+    marginBottom: 16,
+    overflow: 'hidden',
   },
 });
