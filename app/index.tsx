@@ -14,6 +14,9 @@ export default function Index() {
 
   const checkAuth = async () => {
     try {
+      if (__DEV__) {
+        await AsyncStorage.clear();
+      }
       const auth = await AsyncStorage.getItem(AUTH_KEY);
       setIsAuthenticated(auth === 'true');
     } catch (e) {

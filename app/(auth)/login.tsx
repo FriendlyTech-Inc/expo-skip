@@ -1,55 +1,31 @@
 // app/(auth)/login.tsx
-import { StyleSheet, View, Animated, Keyboard, Platform, KeyboardAvoidingView, TouchableWithoutFeedback } from 'react-native';
-import { Button, Text, IconButton } from 'react-native-paper';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  TextInput,
+} from 'react-native';
+import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter, Redirect } from 'expo-router';
-import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Colors from '@/constants/Colors';
 
 const AUTH_KEY = 'isAuthenticated';
-const __DEV__ = process.env.NODE_ENV === 'development';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
-
   const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    checkAuthStatus();
-    
-    // 初期アニメーション
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
-
-  const checkAuthStatus = async () => {
-    try {
-      const auth = await AsyncStorage.getItem(AUTH_KEY);
-      setIsAuthenticated(auth === 'true');
-    } catch (e) {
-      setIsAuthenticated(false);
-    }
-  };
 
   const handleLogin = async () => {
     Keyboard.dismiss();
@@ -62,140 +38,107 @@ export default function LoginScreen() {
     setIsLoading(true);
     setError('');
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    if (studentId === '1234' && password === 'Pass') {
-      router.replace('/(tabs)');
-    } else {
-      setError('学生番号またはパスワードが間違っています 🔍');
-      Animated.sequence([
-        Animated.timing(slideAnim, {
-          toValue: -10,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 10,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-      ]).start();
+    try {
+      // 開発用の認証
+      if (studentId === '1234' && password === 'Pass') {
+        await AsyncStorage.setItem(AUTH_KEY, 'true');
+        router.replace('/(tabs)');
+      } else {
+        setError('学生番号またはパスワードが間違っています 🔍');
+      }
+    } catch (e) {
+      setError('ログインに失敗しました。もう一度お試しください。');
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
-  if (isAuthenticated === null) {
-    return null;
-  }
-
-  if (isAuthenticated) {
-    return <Redirect href="/(tabs)" />;
-  }
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
       <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.keyboardAvoidView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <Animated.View 
-            style={[
-              styles.content,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
-              }
-            ]}
-          >
-            {/* ロゴ部分 */}
+          <View style={styles.inner}>
+            {/* Logo Section */}
             <View style={styles.logoContainer}>
               <Text style={styles.logoText}>skip</Text>
               <Text style={styles.subText}>skipで実りある学びを</Text>
             </View>
 
-            {/* フォーム部分 */}
+            {/* Form Section */}
             <View style={styles.formContainer}>
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>学生番号</Text>
-                <TextInput
-                  value={studentId}
-                  onChangeText={(text) => {
-                    setStudentId(text);
-                    setError('');
-                  }}
-                  style={[
-                    styles.input,
-                    error && !studentId && styles.inputError
-                  ]}
-                  keyboardType="numeric"
-                  maxLength={8}
-                  editable={!isLoading}
-                  placeholder="学生番号を入力"
-                  placeholderTextColor="rgba(255, 255, 255, 0.5)"
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>パスワード</Text>
-                <View style={styles.passwordContainer}>
+                <View style={styles.inputWrapper}>
                   <TextInput
-                    value={password}
-                    onChangeText={(text) => {
-                      setPassword(text);
+                    style={styles.input}
+                    value={studentId}
+                    onChangeText={text => {
+                      setStudentId(text);
                       setError('');
                     }}
-                    secureTextEntry={!showPassword}
-                    style={[
-                      styles.input,
-                      styles.passwordInput,
-                      error && !password && styles.inputError
-                    ]}
-                    editable={!isLoading}
-                    placeholder="パスワードを入力"
+                    placeholder="学生番号を入力"
                     placeholderTextColor="rgba(255, 255, 255, 0.5)"
-                  />
-                  <IconButton
-                    icon={showPassword ? 'eye-off' : 'eye'}
-                    iconColor="#ffffff"
-                    size={24}
-                    onPress={() => setShowPassword(!showPassword)}
-                    style={styles.eyeIcon}
+                    keyboardType="numeric"
+                    maxLength={8}
+                    editable={!isLoading}
                   />
                 </View>
               </View>
 
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>パスワード</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    style={[styles.input, { paddingRight: 50 }]}
+                    value={password}
+                    onChangeText={text => {
+                      setPassword(text);
+                      setError('');
+                    }}
+                    placeholder="パスワードを入力"
+                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                    secureTextEntry={!showPassword}
+                    editable={!isLoading}
+                  />
+                  <TouchableWithoutFeedback onPress={() => setShowPassword(!showPassword)}>
+                    <View style={styles.eyeIcon}>
+                      <MaterialCommunityIcons
+                        name={showPassword ? 'eye-off' : 'eye'}
+                        size={24}
+                        color="rgba(255, 255, 255, 0.8)"
+                      />
+                    </View>
+                  </TouchableWithoutFeedback>
+                </View>
+              </View>
+
               {error ? (
-                <Animated.Text style={styles.errorText}>{error}</Animated.Text>
+                <Text style={styles.errorText}>{error}</Text>
               ) : null}
 
-              <Button
-                mode="contained"
+              <TouchableWithoutFeedback 
                 onPress={handleLogin}
-                style={styles.button}
-                loading={isLoading}
                 disabled={isLoading}
-                buttonColor="#ffffff"
-                textColor={Colors.primary}
-                labelStyle={styles.buttonLabel}
               >
-                {isLoading ? 'ログイン中...' : 'LOGIN'}
-              </Button>
+                <View style={styles.loginButton}>
+                  <Text style={styles.loginButtonText}>
+                    {isLoading ? 'ログイン中...' : 'LOGIN'}
+                  </Text>
+                </View>
+              </TouchableWithoutFeedback>
 
+              {/* 開発用情報 */}
               {__DEV__ && (
-                <Text style={styles.helpText}>
+                <Text style={styles.devInfo}>
                   開発用: 1234 / Pass
                 </Text>
               )}
             </View>
-          </Animated.View>
+          </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -203,17 +146,17 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: Colors.primary,
   },
-  keyboardAvoidView: {
+  container: {
     flex: 1,
   },
-  content: {
+  inner: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 24,
+    padding: 24,
   },
   logoContainer: {
     alignItems: 'center',
@@ -226,15 +169,13 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   subText: {
-    color: '#ffffff',
+    color: 'rgba(255, 255, 255, 0.8)',
     marginTop: 8,
-    opacity: 0.8,
     fontSize: 14,
     letterSpacing: 1,
   },
   formContainer: {
     width: '100%',
-    paddingHorizontal: 20,
   },
   inputContainer: {
     marginBottom: 20,
@@ -243,56 +184,55 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     marginBottom: 8,
     fontSize: 14,
-    letterSpacing: 0.5,
+    marginLeft: 4,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 8,
-    padding: 12,
-    color: '#ffffff',
-    fontSize: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  inputError: {
-    borderColor: '#FFB6C1',
-    borderWidth: 2,
-  },
-  passwordContainer: {
+  inputWrapper: {
     position: 'relative',
   },
-  passwordInput: {
-    paddingRight: 50,
+  input: {
+    height: 56,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    color: '#ffffff',
   },
   eyeIcon: {
     position: 'absolute',
-    right: -8,
-    top: -8,
+    right: 12,
+    top: '50%',
+    transform: [{ translateY: -12 }],
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  button: {
+  loginButton: {
+    height: 56,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 32,
-    marginBottom: 24,
-    borderRadius: 8,
-    elevation: 2,
-    paddingVertical: 4,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
-  buttonLabel: {
-    fontSize: 16,
+  loginButtonText: {
+    color: Colors.primary,
+    fontSize: 18,
     fontWeight: '600',
-    lineHeight: 24,
-  },
-  helpText: {
-    textAlign: 'center',
-    color: '#ffffff',
-    opacity: 0.7,
-    fontSize: 12,
+    letterSpacing: 1,
   },
   errorText: {
     color: '#ffffff',
@@ -300,7 +240,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 14,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 8,
+    padding: 12,
+    borderRadius: 8,
+  },
+  devInfo: {
+    color: 'rgba(255, 255, 255, 0.7)',
+    textAlign: 'center',
+    fontSize: 12,
+    marginTop: 24,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
     borderRadius: 8,
   },
 });
