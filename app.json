@@ -38,6 +38,12 @@
         "projectId": "ee4c2f64-fef9-4c8a-bad4-a38e792340bc"
       }
     },
-    "owner": "tsunoda_s"
+    "owner": "tsunoda_s",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/ee4c2f64-fef9-4c8a-bad4-a38e792340bc"
+    }
   }
 }
