@@ -1,9 +1,11 @@
-// components/study/attack/AttackTile.tsx
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import React, { useRef } from 'react';
+import { StyleSheet, TouchableOpacity, View, Animated } from 'react-native';
+import Typography from '@/components/common/Typography';
 import { getTileColor } from '@/constants/study/attack';
 import type { AttackTile as AttackTileType } from '@/types/attack';
-import Colors from '@/constants/Colors';
+import { shadows } from '@/styles/shadows';
+import { spacing } from '@/styles/spacing';
+import { animations } from '@/styles/animations';
 
 interface AttackTileProps {
   tile: AttackTileType;
@@ -13,59 +15,94 @@ interface AttackTileProps {
 
 export default function AttackTile({ tile, size, onPress }: AttackTileProps) {
   const backgroundColor = getTileColor(tile.level);
+  const scale = useRef(new Animated.Value(1)).current;
+  
+  const handlePressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.95,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 10,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 10,
+    }).start();
+  };
 
   return (
     <TouchableOpacity
-      style={[
-        styles.container,
-        {
-          width: size,
-          height: size,
-          backgroundColor,
-        },
-      ]}
       onPress={() => onPress(tile.id)}
-      activeOpacity={0.7}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      activeOpacity={1}
     >
-      <View style={styles.content}>
-        <Text style={styles.number}>{tile.number}</Text>
-        {tile.title && <Text style={styles.title} numberOfLines={2}>{tile.title}</Text>}
-      </View>
+      <Animated.View
+        style={[
+          styles.container,
+          {
+            width: size,
+            height: size,
+            backgroundColor,
+            transform: [{ scale }],
+            opacity: tile.isCompleted ? 1 : 0.85,
+          },
+        ]}
+      >
+        <View style={styles.content}>
+          <Typography 
+            variant="h2"
+            style={styles.number}
+            color="#fff"
+          >
+            {tile.number}
+          </Typography>
+          {tile.title && (
+            <Typography 
+              variant="caption"
+              style={styles.title}
+              color="#fff"
+              numberOfLines={2}
+            >
+              {tile.title}
+            </Typography>
+          )}
+        </View>
+      </Animated.View>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 8,
-    padding: 8,
+    borderRadius: 12,
+    padding: spacing.sm,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    ...shadows.sm,
   },
   content: {
     alignItems: 'center',
     justifyContent: 'center',
+    gap: spacing.xs,
   },
   number: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#fff',
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
   title: {
     fontSize: 12,
-    color: '#fff',
     textAlign: 'center',
-    marginTop: 4,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0.5, height: 0.5 },
+    textShadowRadius: 1,
   },
 });

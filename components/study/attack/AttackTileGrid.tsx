@@ -1,12 +1,18 @@
-// components/study/attack/AttackTileGrid.tsx
-import { View, StyleSheet, useWindowDimensions } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, useWindowDimensions, LayoutAnimation, Platform, UIManager } from 'react-native';
 import type { AttackTile as AttackTileType } from '@/types/attack';
 import AttackTile from './AttackTile';
+import { spacing } from '@/styles/spacing';
+
+// Enable LayoutAnimation for Android
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 interface AttackTileGridProps {
   tiles: AttackTileType[];
   columns?: number;
-  onPressTile: (tileId: string) => void; // タップハンドラを追加
+  onPressTile: (tileId: string) => void;
 }
 
 export default function AttackTileGrid({ 
@@ -17,10 +23,15 @@ export default function AttackTileGrid({
   const { width: windowWidth } = useWindowDimensions();
   
   // Calculate tile size based on window width and number of columns
-  const padding = 32; // Total horizontal padding
-  const gap = 8; // Gap between tiles
+  const padding = spacing.xl * 2; // Total horizontal padding
+  const gap = spacing.sm; // Gap between tiles
   const availableWidth = windowWidth - padding;
   const tileSize = (availableWidth - (gap * (columns - 1))) / columns;
+
+  React.useEffect(() => {
+    // Animate layout changes
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  }, [tiles]);
 
   return (
     <View style={styles.container}>
@@ -46,7 +57,7 @@ export default function AttackTileGrid({
               <AttackTile
                 tile={tile}
                 size={tileSize}
-                onPress={onPressTile} // タップハンドラを渡す
+                onPress={onPressTile}
               />
             </View>
           );
@@ -63,7 +74,7 @@ export default function AttackTileGrid({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: spacing.md,
   },
   grid: {
     position: 'relative',

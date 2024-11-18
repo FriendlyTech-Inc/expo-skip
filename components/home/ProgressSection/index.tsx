@@ -1,12 +1,13 @@
-// components/home/ProgressSection/index.tsx
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text } from 'react-native-paper';
 import Colors from '@/constants/Colors';
-import CircularProgress from './CircularProgress';
+import CircleProgress from './CircularProgress';
 import ExamInfo from './ExamInfo';
+import Card from '@/components/common/Card';
+import Typography from '@/components/common/Typography';
+import { spacing } from '@/styles/spacing';
+import { shadows } from '@/styles/shadows';
 
-// 仮のデータ型定義
 interface ProgressData {
   videoProgress: number;
   quizProgress: number;
@@ -16,7 +17,6 @@ interface ProgressData {
   remainingDays: number;
 }
 
-// 仮のデータ
 const progressData: ProgressData = {
   videoProgress: 15.0,
   quizProgress: 35.0,
@@ -28,30 +28,42 @@ const progressData: ProgressData = {
 
 export default function ProgressSection() {
   return (
-    <View style={styles.container}>
+    <Card variant="elevated" style={styles.container}>
       {/* 上部の進捗表示 */}
       <View style={styles.progressContainer}>
         {/* 学習進捗率 */}
         <View style={styles.studyScoreContainer}>
-          <Text style={styles.label}>学習現在値</Text>
+          <Typography variant="caption" style={styles.label}>
+            学習現在値
+          </Typography>
           <View style={styles.scoreRow}>
-            <Text style={styles.scoreValue}>{progressData.studyScore}</Text>
-            <Text style={styles.scoreUnit}>%</Text>
+            <Typography variant="h1" color={Colors.text} style={styles.scoreValue}>
+              {progressData.studyScore}
+            </Typography>
+            <Typography 
+              variant="body2" 
+              color={Colors.subText}
+              style={styles.scoreUnit}
+            >
+              %
+            </Typography>
           </View>
-          <Text style={styles.subText}>残日数 {progressData.remainingDays}日</Text>
+          <Typography variant="caption" style={styles.subText}>
+            残日数 {progressData.remainingDays}日
+          </Typography>
         </View>
 
         {/* 進捗サークル */}
         <View style={styles.circlesContainer}>
           <View style={styles.circleWrapper}>
-            <CircularProgress
+            <CircleProgress
               progress={progressData.videoProgress}
               title="映像進捗率"
               color={Colors.progressChart.video}
             />
           </View>
           <View style={styles.circleWrapper}>
-            <CircularProgress
+            <CircleProgress
               progress={progressData.quizProgress}
               title="問題定着率"
               color={Colors.progressChart.quiz}
@@ -66,55 +78,50 @@ export default function ProgressSection() {
         totalDays={progressData.totalDays}
         remainingDays={progressData.remainingDays}
       />
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: Colors.card,
+    padding: spacing.md,
   },
   progressContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   studyScoreContainer: {
     flex: 1,
   },
   label: {
-    fontSize: 12,
-    color: Colors.subText,
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   scoreRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
   },
   scoreValue: {
-    fontSize: 32,
-    fontWeight: '600',
-    color: Colors.text,
+    lineHeight: 38,
   },
   scoreUnit: {
-    fontSize: 16,
-    color: Colors.subText,
-    marginLeft: 4,
+    marginLeft: spacing.xs,
   },
   subText: {
-    fontSize: 12,
-    color: Colors.subText,
-    marginTop: 4,
+    marginTop: spacing.xs,
   },
   circlesContainer: {
     flexDirection: 'row',
     flex: 2,
     justifyContent: 'flex-end',
+    gap: spacing.md,
   },
   circleWrapper: {
-    marginLeft: 16,
+    ...shadows.sm,
+    backgroundColor: Colors.card,
+    borderRadius: 12,
+    padding: spacing.sm,
   },
 });

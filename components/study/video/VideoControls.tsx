@@ -1,10 +1,18 @@
-// components/study/video/VideoControls.tsx
-import { View, StyleSheet, TouchableOpacity, Animated, Platform } from 'react-native';
-import { Text } from 'react-native-paper';
+import React, { useCallback } from 'react';
+import { 
+  View, 
+  StyleSheet, 
+  Animated, 
+  Platform,
+  Pressable,
+} from 'react-native';
+import Typography from '@/components/common/Typography';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import type { MaterialCommunityIcons as IconType } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
+import { spacing } from '@/styles/spacing';
 
 interface VideoControlsProps {
   isPlaying: boolean;
@@ -21,6 +29,15 @@ interface VideoControlsProps {
   onFullscreen: () => void;
   onRewind: () => void;
   onForward: () => void;
+}
+
+type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
+
+interface ControlButtonProps {
+  icon: IconName;
+  size?: number;
+  onPress: () => void;
+  style?: any;
 }
 
 export default function VideoControls({
@@ -40,8 +57,8 @@ export default function VideoControls({
   onForward,
 }: VideoControlsProps) {
   const insets = useSafeAreaInsets();
-  
-  const formatTime = (milliseconds: number) => {
+
+  const formatTime = useCallback((milliseconds: number) => {
     if (!milliseconds) return '0:00';
     
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -53,7 +70,33 @@ export default function VideoControls({
       return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
+  }, []);
+
+  const ControlButton = useCallback(({ 
+    icon, 
+    size = 24, 
+    onPress,
+    style,
+  }: ControlButtonProps) => (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.controlButton,
+        pressed && styles.controlButtonPressed,
+        style,
+      ]}
+      android_ripple={{
+        color: 'rgba(255, 255, 255, 0.2)',
+        borderless: true,
+      }}
+    >
+      <MaterialCommunityIcons 
+        name={icon}
+        size={size} 
+        color="#fff"
+      />
+    </Pressable>
+  ), []);
 
   return (
     <Animated.View 
@@ -71,50 +114,54 @@ export default function VideoControls({
         styles.topControls,
         { paddingTop: isFullscreen ? 0 : insets.top }
       ]}>
-        <TouchableOpacity 
-          style={styles.backButton}
+        <ControlButton 
+          icon={isFullscreen ? "chevron-down" : "chevron-left"}
+          size={28}
           onPress={onBack}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={styles.backButton}
+        />
+        <Typography
+          variant="body1"
+          color="#fff"
+          style={styles.title}
+          numberOfLines={1}
         >
-          <MaterialCommunityIcons 
-            name={isFullscreen ? "chevron-down" : "chevron-left"} 
-            size={28} 
-            color="#fff"
-          />
-        </TouchableOpacity>
-        <Text style={styles.title} numberOfLines={1}>{title}</Text>
+          {title}
+        </Typography>
         <View style={styles.placeholder} />
       </View>
 
       {/* 中央コントロール */}
       <View style={styles.centerControls}>
-        <TouchableOpacity
+        <ControlButton
+          icon="rewind-10"
+          size={36}
           onPress={onRewind}
-          style={styles.controlButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <MaterialCommunityIcons name="rewind-10" size={36} color="#fff" />
-        </TouchableOpacity>
+        />
 
-        <TouchableOpacity
+        <Pressable
           onPress={onPlayPause}
-          style={styles.playPauseButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={({ pressed }) => [
+            styles.playPauseButton,
+            pressed && styles.playPauseButtonPressed,
+          ]}
+          android_ripple={{
+            color: 'rgba(255, 255, 255, 0.3)',
+            borderless: true,
+          }}
         >
           <MaterialCommunityIcons
             name={isPlaying ? "pause" : "play"}
             size={44}
             color="#fff"
           />
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
+        <ControlButton
+          icon="fast-forward-10"
+          size={36}
           onPress={onForward}
-          style={styles.controlButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <MaterialCommunityIcons name="fast-forward-10" size={36} color="#fff" />
-        </TouchableOpacity>
+        />
       </View>
 
       {/* 下部コントロール */}
@@ -136,31 +183,44 @@ export default function VideoControls({
             onSlidingComplete={onSeek}
           />
           <View style={styles.timeContainer}>
-            <Text style={styles.timeText}>{formatTime(progress)}</Text>
-            <Text style={styles.timeText}>{formatTime(duration)}</Text>
+            <Typography 
+              variant="caption" 
+              color="#fff"
+              style={styles.timeText}
+            >
+              {formatTime(progress)}
+            </Typography>
+            <Typography 
+              variant="caption" 
+              color="#fff"
+              style={styles.timeText}
+            >
+              {formatTime(duration)}
+            </Typography>
           </View>
         </View>
 
         <View style={styles.controls}>
-          <TouchableOpacity
+          <Pressable
             onPress={onSpeedChange}
-            style={styles.speedButton}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={({ pressed }) => [
+              styles.speedButton,
+              pressed && styles.speedButtonPressed,
+            ]}
           >
-            <Text style={styles.speedText}>{playbackSpeed}x</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={onFullscreen}
-            style={styles.controlButton}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <MaterialCommunityIcons
-              name={isFullscreen ? "fullscreen-exit" : "fullscreen"}
-              size={24}
+            <Typography 
+              variant="button" 
               color="#fff"
-            />
-          </TouchableOpacity>
+              style={styles.speedText}
+            >
+              {playbackSpeed}x
+            </Typography>
+          </Pressable>
+
+          <ControlButton
+            icon={isFullscreen ? "fullscreen-exit" : "fullscreen"}
+            onPress={onFullscreen}
+          />
         </View>
       </View>
     </Animated.View>
@@ -176,19 +236,19 @@ const styles = StyleSheet.create({
   topControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   backButton: {
-    padding: 8,
+    marginRight: spacing.sm,
   },
   title: {
     flex: 1,
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginHorizontal: 16,
+    marginHorizontal: spacing.md,
     textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   placeholder: {
     width: 44,
@@ -197,21 +257,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 48,
+    gap: spacing.xl,
   },
   controlButton: {
-    padding: 8,
+    padding: spacing.sm,
+    borderRadius: 24,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  controlButtonPressed: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   playPauseButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 44,
-    padding: 22,
+    padding: spacing.lg,
+  },
+  playPauseButtonPressed: {
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
   },
   bottomControls: {
-    padding: 16,
+    padding: spacing.md,
   },
   progressContainer: {
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   slider: {
     width: '100%',
@@ -220,28 +288,32 @@ const styles = StyleSheet.create({
   timeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: -8,
-    paddingHorizontal: 4,
+    marginTop: -spacing.sm,
+    paddingHorizontal: spacing.xs,
   },
   timeText: {
-    color: '#fff',
-    fontSize: 12,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   controls: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    gap: 16,
+    gap: spacing.md,
   },
   speedButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     borderRadius: 16,
   },
+  speedButtonPressed: {
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+  },
   speedText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
 });

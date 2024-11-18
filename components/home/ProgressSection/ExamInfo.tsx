@@ -1,8 +1,9 @@
-// components/home/ProgressSection/ExamInfo.tsx
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import Typography from '@/components/common/Typography';
 import Colors from '@/constants/Colors';
+import { spacing } from '@/styles/spacing';
+import Card from '@/components/common/Card';
 
 interface ExamInfoProps {
   examDate: string;
@@ -10,15 +11,23 @@ interface ExamInfoProps {
   remainingDays: number;
 }
 
-export default function ExamInfo({ examDate, totalDays, remainingDays }: ExamInfoProps) {
+export default function ExamInfo({ 
+  examDate, 
+  totalDays, 
+  remainingDays 
+}: ExamInfoProps) {
   const completionRate = ((totalDays - remainingDays) / totalDays) * 100;
 
   return (
-    <View style={styles.container}>
+    <Card style={styles.container}>
       {/* 試験予定日 */}
       <View style={styles.row}>
-        <Text style={styles.label}>試験予定日:</Text>
-        <Text style={styles.value}>{examDate}</Text>
+        <Typography variant="caption" color={Colors.subText}>
+          試験予定日:
+        </Typography>
+        <Typography variant="body2" style={styles.value}>
+          {examDate}
+        </Typography>
       </View>
 
       {/* プログレスバー */}
@@ -32,43 +41,46 @@ export default function ExamInfo({ examDate, totalDays, remainingDays }: ExamInf
           />
         </View>
         <View style={styles.progressValues}>
-          <Text style={styles.progressText}>{totalDays}点</Text>
-          <Text style={styles.progressText}>{totalDays}点</Text>
+          <Typography variant="caption" color={Colors.subText}>
+            {totalDays}点
+          </Typography>
+          <Typography variant="caption" color={Colors.subText}>
+            {totalDays}点
+          </Typography>
         </View>
       </View>
 
       {/* 目標達成率 */}
       <View style={styles.achievementContainer}>
-        <Text style={styles.achievementRate}>1週間後の目標達成率：80%</Text>
+        <Typography 
+          variant="body2" 
+          color={Colors.text}
+          center
+        >
+          1週間後の目標達成率：80%
+        </Typography>
       </View>
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 8,
-    padding: 12,
     backgroundColor: '#f8f8f8',
     borderRadius: 8,
+    padding: spacing.md,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
-  },
-  label: {
-    fontSize: 12,
-    color: Colors.subText,
-    marginRight: 8,
+    marginBottom: spacing.md,
+    gap: spacing.xs,
   },
   value: {
-    fontSize: 14,
-    color: Colors.text,
-    fontWeight: '500',
+    marginLeft: spacing.xs,
   },
   progressBarContainer: {
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   progressBar: {
     height: 4,
@@ -84,18 +96,10 @@ const styles = StyleSheet.create({
   progressValues: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 4,
-  },
-  progressText: {
-    fontSize: 12,
-    color: Colors.subText,
+    marginTop: spacing.xs,
   },
   achievementContainer: {
-    marginTop: 8,
+    marginTop: spacing.sm,
     alignItems: 'center',
-  },
-  achievementRate: {
-    fontSize: 12,
-    color: Colors.text,
   },
 });

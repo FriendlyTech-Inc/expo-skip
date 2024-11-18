@@ -1,11 +1,11 @@
-// components/home/ProgressSection/CircularProgress.tsx
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import { StyleSheet, View, Animated } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import Colors from '@/constants/Colors';
+import Typography from '@/components/common/Typography';
+import { spacing } from '@/styles/spacing';
 
-interface CircularProgressProps {
+interface CircleProgressProps {
   progress: number;
   title: string;
   color: string;
@@ -13,13 +13,13 @@ interface CircularProgressProps {
   strokeWidth?: number;
 }
 
-export default function CircularProgress({
+export default function CircleProgress({
   progress,
   title,
   color,
   size = 80,
   strokeWidth = 8,
-}: CircularProgressProps) {
+}: CircleProgressProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const progressValue = Math.min(100, Math.max(0, progress));
@@ -27,7 +27,9 @@ export default function CircularProgress({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
+      <Typography variant="caption" style={styles.title}>
+        {title}
+      </Typography>
       <View style={styles.progressContainer}>
         <Svg width={size} height={size} style={styles.svg}>
           {/* Background circle */}
@@ -48,15 +50,19 @@ export default function CircularProgress({
             stroke={color}
             strokeWidth={strokeWidth}
             strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
+            strokeDashoffset={String(strokeDashoffset)}
             strokeLinecap="round"
             fill="none"
             transform={`rotate(-90 ${size / 2} ${size / 2})`}
           />
         </Svg>
         <View style={styles.valueContainer}>
-          <Text style={styles.value}>{progressValue.toFixed(1)}</Text>
-          <Text style={styles.unit}>%</Text>
+          <Typography variant="body1" style={styles.value}>
+            {progressValue.toFixed(1)}
+          </Typography>
+          <Typography variant="caption" style={styles.unit}>
+            %
+          </Typography>
         </View>
       </View>
     </View>
@@ -70,7 +76,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 12,
     color: Colors.subText,
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   progressContainer: {
     position: 'relative',
