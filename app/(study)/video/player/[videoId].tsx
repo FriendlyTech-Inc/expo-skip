@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, TouchableWithoutFeedback, Animated, Dimensions } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
+import { Audio } from 'expo-av';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -51,6 +52,25 @@ export default function VideoPlayerScreen() {
       ScreenOrientation.removeOrientationChangeListener(subscription);
       ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
     };
+  }, []);
+
+  useEffect(() => {
+    const setupAudioVideo = async () => {
+      try {
+        // Audio.setAudioModeAsyncを使用
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+          staysActiveInBackground: false,
+          playsInSilentModeIOS: true,
+          shouldDuckAndroid: true,
+          playThroughEarpieceAndroid: false
+        });
+      } catch (error) {
+        console.error('Failed to set audio mode:', error);
+      }
+    };
+
+    setupAudioVideo();
   }, []);
 
   const isOrientationLandscape = (orientation?: ScreenOrientation.Orientation) => {
@@ -187,6 +207,8 @@ export default function VideoPlayerScreen() {
               // Handle fullscreen changes if needed
               console.log('Fullscreen update:', event);
             }}
+            volume={1.0}  // 音量を設定（0.0 〜 1.0）
+            isMuted={false}  // ミュートしない
           />
           
           {isControlsVisible && (
