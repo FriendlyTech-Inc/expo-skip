@@ -8,14 +8,14 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { router } from 'expo-router';
 import VideoControls from '@/components/study/video/VideoControls';
 
-const SAMPLE_VIDEO_URL = 'https://sample-video-ft.s3.ap-northeast-1.amazonaws.com/file_example_MP4_480_1_5MG.mp4';
+const SAMPLE_VIDEO_URL = 'https://sample-video-ft.s3.ap-northeast-1.amazonaws.com/%E2%89%AA5%E5%88%86%E3%81%A6%E3%82%99%E3%82%8F%E3%81%8B%E3%82%8B%EF%BC%81%E2%89%AB%E5%8F%96%E5%BE%97%E3%81%8B%E3%82%99%E5%BD%93%E3%81%9F%E3%82%8A%E5%89%8D%E3%81%AE%E6%99%82%E4%BB%A3%E3%81%AB%EF%BC%81%EF%BC%88IT%E3%83%8F%E3%82%9A%E3%82%B9%E3%83%9B%E3%82%9A%E3%83%BC%E3%83%88%E8%AC%9B%E5%BA%A7%EF%BC%89.mp4';
 
 export default function VideoPlayerScreen() {
   const videoRef = useRef<Video>(null);
   const [status, setStatus] = useState<any>({});
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
-  const [isControlsVisible, setIsControlsVisible] = useState(true);
+  const [isControlsVisible, setIsControlsVisible] = useState(false);
   const controlsOpacity = useRef(new Animated.Value(1)).current;
   const controlsTimeout = useRef<NodeJS.Timeout>();
   const [orientation, setOrientation] = useState<ScreenOrientation.Orientation>();
@@ -32,6 +32,9 @@ export default function VideoPlayerScreen() {
     };
 
     setupOrientation();
+
+    // コントロールを最初は非表示にする
+    hideControlsAnimation();
 
     // 画面の向きの変更を監視
     const subscription = ScreenOrientation.addOrientationChangeListener((event) => {
@@ -83,10 +86,10 @@ export default function VideoPlayerScreen() {
   };
 
   const handleToggleControls = () => {
-    if (!isControlsVisible) {
-      showControlsAnimation();
-    } else {
+    if (isControlsVisible) {
       hideControlsAnimation();
+    } else {
+      showControlsAnimation();
     }
   };
 
@@ -96,6 +99,7 @@ export default function VideoPlayerScreen() {
     } else {
       await videoRef.current?.playAsync();
     }
+    // 再生/一時停止時にコントロールを表示したままにする
     showControlsAnimation();
   };
 
