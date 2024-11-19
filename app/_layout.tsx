@@ -1,4 +1,4 @@
-import { Redirect, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper';
@@ -10,10 +10,11 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <PaperProvider theme={colorScheme === 'dark' ? MD3DarkTheme : MD3LightTheme}>
-        <Stack>
+        <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(study)" options={{ headerShown: false }} />
         </Stack>
       </PaperProvider>
     </GestureHandlerRootView>

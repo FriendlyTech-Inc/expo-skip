@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import Typography from '@/components/common/Typography';
 import Svg, { Circle } from 'react-native-svg';
 import Colors from '@/constants/Colors';
 
@@ -24,7 +24,13 @@ export default function CircleProgress({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
+      <Typography 
+        variant="body1" 
+        color={Colors.subText}
+        style={styles.title}
+      >
+        {title}
+      </Typography>
       <View style={styles.progressContainer}>
         <Svg width={size} height={size}>
           <Circle
@@ -49,10 +55,20 @@ export default function CircleProgress({
           />
         </Svg>
         <View style={styles.valueContainer}>
-          <Text style={[styles.value, { color }]}>
+          <Typography 
+            variant="h2" 
+            color={color}
+            style={styles.value}
+          >
             {progress.toFixed(1)}
-          </Text>
-          <Text style={styles.unit}>%</Text>
+          </Typography>
+          <Typography 
+            variant="body2" 
+            color={Colors.subText}
+            style={styles.unit}
+          >
+            %
+          </Typography>
         </View>
       </View>
     </View>
@@ -67,8 +83,6 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   title: {
-    fontSize: 14,
-    color: Colors.subText,
     marginBottom: 12,
   },
   progressContainer: {
@@ -81,12 +95,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   value: {
-    fontSize: 24,
     fontWeight: '700',
   },
   unit: {
-    fontSize: 12,
-    color: Colors.subText,
     marginTop: 2,
   },
 });

@@ -118,7 +118,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   mainScore: {
-    fontSize: 24,
     fontWeight: '600',
     marginBottom: 16,
   },

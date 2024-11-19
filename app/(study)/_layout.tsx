@@ -10,11 +10,7 @@ export default function StudyLayout() {
       <StatusBar style="light" />
       <Stack
         screenOptions={{
-          headerStyle: {
-            backgroundColor: Colors.primary,
-          },
-          headerTintColor: '#fff',
-          headerShadowVisible: false,
+          headerShown: false,  // すべてのスクリーンでデフォルトヘッダーを非表示
           contentStyle: {
             backgroundColor: Colors.background,
           },
@@ -23,24 +19,48 @@ export default function StudyLayout() {
         <Stack.Screen
           name="video/index"
           options={{
+            headerShown: true,  // カスタムヘッダーを表示
+            headerStyle: {
+              backgroundColor: Colors.primary,
+            },
+            headerTintColor: '#fff',
+            headerShadowVisible: false,
             title: '映像授業',
           }}
         />
         <Stack.Screen
           name="attack/index"
           options={{
+            headerShown: true,  // カスタムヘッダーを表示
+            headerStyle: {
+              backgroundColor: Colors.primary,
+            },
+            headerTintColor: '#fff',
+            headerShadowVisible: false,
             title: 'Attack5',
           }}
         />
         <Stack.Screen
           name="video/[courseId]"
           options={{
+            headerShown: true,  // カスタムヘッダーを表示
+            headerStyle: {
+              backgroundColor: Colors.primary,
+            },
+            headerTintColor: '#fff',
+            headerShadowVisible: false,
             title: '授業一覧',
           }}
         />
         <Stack.Screen
           name="attack/[courseId]"
           options={{
+            headerShown: true,  // カスタムヘッダーを表示
+            headerStyle: {
+              backgroundColor: Colors.primary,
+            },
+            headerTintColor: '#fff',
+            headerShadowVisible: false,
             title: '問題一覧',
           }}
         />
